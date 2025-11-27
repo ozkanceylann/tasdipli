@@ -37,205 +37,174 @@
 
 <body>
 
-  <!-- Güvenlik -->
-  <script>
-    const firma = localStorage.getItem("firma");
-    const rol = localStorage.getItem("rol");
-    const session = localStorage.getItem("session");
+<div class="content-area" style="margin-left:260px; padding:25px;">
 
-    if (!session || !firma) {
-      window.location.href = "login.html";
-    }
-  </script>
+  <h2 style="margin-bottom:20px;">📊 Raporlama Ekranı</h2>
 
-  <div class="content-area" style="margin-left:260px; padding:25px;">
+  <!-- Tarih Filtresi -->
+  <div style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.12);margin-bottom:25px;">
+    <label><b>Başlangıç Tarihi:</b></label>
+    <input type="date" id="startDate" />
 
-    <h2 style="margin-bottom:20px;">📊 Raporlama Ekranı</h2>
+    &nbsp;&nbsp;
+    <label><b>Bitiş Tarihi:</b></label>
+    <input type="date" id="endDate" />
 
-    <!-- Tarih Filtre -->
-    <div style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.12);margin-bottom:25px;">
-      <label><b>Başlangıç Tarihi:</b></label>
-      <input type="date" id="startDate" />
-      &nbsp;&nbsp;
-      <label><b>Bitiş Tarihi:</b></label>
-      <input type="date" id="endDate" />
-      &nbsp;&nbsp;
-      <button class="btn-primary" onclick="loadReport()">Raporla</button>
-    </div>
-
-    <!-- Grafik 1 -->
-    <div style="background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
-      <h3>📈 Günlük Sipariş Sayısı</h3>
-      <canvas id="dailyChart" style="max-height:300px;"></canvas>
-    </div>
-
-    <!-- Grafik 2 -->
-    <div style="background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
-      <h3>📞 Sipariş Alan Kişiye Göre Satış</h3>
-      <canvas id="salesByTel" style="max-height:300px;"></canvas>
-    </div>
-
-    <!-- Özet Kartlar -->
-    <div id="summaryCards" style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:25px;"></div>
-
-    <!-- Detay Tablosu -->
-    <div class="table-wrapper">
-      <table class="orders-table">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>İsim</th>
-            <th>Tutar</th>
-            <th>Durum</th>
-            <th>Tarih</th>
-            <th>Sipariş Alan Tel</th>
-          </tr>
-        </thead>
-        <tbody id="reportTable"></tbody>
-      </table>
-    </div>
-
+    <button class="btn-primary" onclick="loadReport()">Raporla</button>
   </div>
 
-  <script>
-    const db = supabase.createClient(
-      "https://jarsxtpqzqzhlshpmgot.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphcnN4dHBxenF6aGxzaHBtZ290Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyODExMTcsImV4cCI6MjA3Nzg1NzExN30.98oYONSkb8XSDrfGW2FxhFmt2BLB5ZRo3Ho50GhZYgE"
-    );
+  <!-- Grafik 1 -->
+  <div style="background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+    <h3>📈 Günlük Sipariş Sayısı</h3>
+    <canvas id="dailyChart" style="max-height:300px;"></canvas>
+  </div>
 
-    // Firma bazlı tablo (tasdipli/esin/queen…)
-    const firmaName = localStorage.getItem("firma").toLowerCase();
-    const TABLE = firmaName + "_siparisler";
+  <!-- Grafik 2 -->
+  <div style="background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+    <h3>📞 Sipariş Alan Kişiye Göre Satış</h3>
+    <canvas id="salesByTel" style="max-height:300px;"></canvas>
+  </div>
 
-    let chart1 = null;
-    let chart2 = null;
+  <!-- Özet Kartlar -->
+  <div id="summaryCards" style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:25px;"></div>
 
-    async function loadReport() {
-      const start = document.getElementById("startDate").value;
-      const end = document.getElementById("endDate").value;
+  <!-- Detay Tablosu -->
+  <div class="table-wrapper">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>İsim</th>
+          <th>Tutar</th>
+          <th>Durum</th>
+          <th>Tarih</th>
+          <th>Sipariş Alan Tel</th>
+        </tr>
+      </thead>
+      <tbody id="reportTable"></tbody>
+    </table>
+  </div>
 
-      let q = db.from(TABLE).select("*");
+</div>
 
-      if (start) q = q.gte("tarih", start);
-      if (end) q = q.lte("tarih", end + " 23:59:59");
+<script>
+const db = supabase.createClient(
+  "https://jarsxtpqzqzhlshpmgot.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphcnN4dHBxenF6aGxzaHBtZ290Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyODExMTcsImV4cCI6MjA3Nzg1NzExN30.98oYONSkb8XSDrfGW2FxhFmt2BLB5ZRo3Ho50GhZYgE"
+);
 
-      q = q.order("tarih", { ascending: false });
+const firmaName = localStorage.getItem("firma").toLowerCase();
+const TABLE = firmaName + "_siparisler";
 
-      const { data, error } = await q;
-      if (error) {
-        alert("Rapor hatası: " + error.message);
-        return;
-      }
+let chart1 = null;
+let chart2 = null;
 
-      renderReport(data);
-    }
+async function loadReport(){
+  const start = startDate.value;
+  const end   = endDate.value;
 
-    function renderReport(rows) {
-      const table = document.getElementById("reportTable");
-      const summary = document.getElementById("summaryCards");
+  let q = db.from(TABLE).select("*");
 
-      table.innerHTML = "";
-      summary.innerHTML = "";
+  if(start) q = q.gte("tarih", start);
+  if(end)   q = q.lte("tarih", end + " 23:59:59");
 
-      if (!rows || rows.length === 0) {
-        table.innerHTML = `<tr><td colspan="6">Kayıt bulunamadı</td></tr>`;
-        return;
-      }
+  q = q.order("tarih",{ascending:false});
 
-      let toplamTutar = 0;
-      let adet = rows.length;
-      let kargolanan = rows.filter(r => r.kargo_durumu === "Kargolandı").length;
+  const { data, error } = await q;
+  if(error) return alert("Hata: " + error.message);
 
-      rows.forEach(r => {
-        toplamTutar += Number(r.toplam_tutar || 0);
+  renderReport(data);
+}
 
-        table.innerHTML += `
-          <tr>
-            <td>${r.siparis_no}</td>
-            <td>${r.ad_soyad}</td>
-            <td>${r.toplam_tutar} TL</td>
-            <td>${r.kargo_durumu}</td>
-            <td>${r.tarih?.substring(0,10)}</td>
-            <td>${r.siparis_tel}</td>
-          </tr>
-        `;
-      });
+function renderReport(rows){
+  const table = document.getElementById("reportTable");
+  const summary = document.getElementById("summaryCards");
+  table.innerHTML = "";
+  summary.innerHTML = "";
 
-      summary.innerHTML = `
-        <div class="report-card">
-          <h3>Toplam Sipariş</h3>
-          <div class="value">${adet}</div>
-        </div>
+  if(!rows || rows.length === 0){
+    table.innerHTML = `<tr><td colspan="6">Kayıt bulunamadı</td></tr>`;
+    return;
+  }
 
-        <div class="report-card">
-          <h3>Toplam Tutar</h3>
-          <div class="value">${toplamTutar} TL</div>
-        </div>
+  let toplamTutar = 0;
+  let adet = rows.length;
+  let kargolanan = rows.filter(r => r.kargo_durumu === "Kargolandı").length;
 
-        <div class="report-card">
-          <h3>Kargolanan</h3>
-          <div class="value">${kargolanan}</div>
-        </div>
-      `;
+  rows.forEach(r=>{
+    toplamTutar += Number(r.toplam_tutar || 0);
 
-      buildCharts(rows);
-    }
+    table.innerHTML += `
+      <tr>
+        <td>${r.siparis_no}</td>
+        <td>${r.ad_soyad}</td>
+        <td>${r.toplam_tutar} TL</td>
+        <td>${r.kargo_durumu}</td>
+        <td>${(r.tarih||'').substring(0,10)}</td>
+        <td>${r.siparis_tel}</td>
+      </tr>
+    `;
+  });
 
+  summary.innerHTML = `
+    <div class="report-card">
+      <h3>Toplam Sipariş</h3>
+      <div class="value">${adet}</div>
+    </div>
 
-    // ==============================
-    // GRAFİKLER BURADA OLUŞUYOR
-    // ==============================
-    function buildCharts(rows) {
+    <div class="report-card">
+      <h3>Toplam Tutar</h3>
+      <div class="value">${toplamTutar} TL</div>
+    </div>
 
-      // ----- Günlük Sipariş Grafiği -----
-      const dailyCount = {};
-      rows.forEach(r => {
-        const day = (r.tarih || "").substring(0,10);
-        if (!dailyCount[day]) dailyCount[day] = 0;
-        dailyCount[day]++;
-      });
+    <div class="report-card">
+      <h3>Kargolanan</h3>
+      <div class="value">${kargolanan}</div>
+    </div>
+  `;
 
-      const dailyLabels = Object.keys(dailyCount);
-      const dailyValues = Object.values(dailyCount);
+  buildCharts(rows);
+}
 
-      if (chart1) chart1.destroy();
-      chart1 = new Chart(document.getElementById("dailyChart"), {
-        type: "line",
-        data: {
-          labels: dailyLabels,
-          datasets: [{
-            label: "Günlük Sipariş",
-            data: dailyValues,
-            borderWidth: 3
-          }]
-        }
-      });
+// ==============================
+// GRAFİKLER
+// ==============================
+function buildCharts(rows){
 
-      // ----- Sipariş Alan Telefona Göre Grafik -----
-      const sellerCount = {};
-      rows.forEach(r => {
-        const tel = r.siparis_tel || "Bilinmiyor";
-        if (!sellerCount[tel]) sellerCount[tel] = 0;
-        sellerCount[tel]++;
-      });
+  // Günlük grafiği
+  const daily = {};
+  rows.forEach(r=>{
+    const d = (r.tarih||'').substring(0,10);
+    daily[d] = (daily[d]||0)+1;
+  });
 
-      const sellerLabels = Object.keys(sellerCount);
-      const sellerValues = Object.values(sellerCount);
+  const labels1 = Object.keys(daily);
+  const values1 = Object.values(daily);
 
-      if (chart2) chart2.destroy();
-      chart2 = new Chart(document.getElementById("salesByTel"), {
-        type: "bar",
-        data: {
-          labels: sellerLabels,
-          datasets: [{
-            label: "Sipariş Sayısı",
-            data: sellerValues,
-            borderWidth: 2
-          }]
-        }
-      });
-    }
-  </script>
+  if(chart1) chart1.destroy();
+  chart1 = new Chart(document.getElementById("dailyChart"),{
+    type:"line",
+    data:{ labels:labels1, datasets:[{ label:"Günlük Sipariş", data:values1, borderWidth:3 }] }
+  });
+
+  // Sipariş Alan Tel grafiği
+  const seller = {};
+  rows.forEach(r=>{
+    const tel = r.siparis_tel || "Bilinmiyor";
+    seller[tel] = (seller[tel]||0)+1;
+  });
+
+  const labels2 = Object.keys(seller);
+  const values2 = Object.values(seller);
+
+  if(chart2) chart2.destroy();
+  chart2 = new Chart(document.getElementById("salesByTel"),{
+    type:"bar",
+    data:{ labels:labels2, datasets:[{ label:"Sipariş Sayısı", data:values2, borderWidth:2 }] }
+  });
+}
+
+</script>
 
 </body>
 </html>
