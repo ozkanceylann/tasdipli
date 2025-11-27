@@ -30,6 +30,8 @@ let selectedOrder = null;
 
 const busy = { kargola: new Set(), barkod: new Set() };
 
+
+
 /* ============================================================
    UI HELPERS
 ============================================================ */
@@ -109,11 +111,16 @@ function renderTable(rows){
   rows.forEach(o=>{
     const tr = document.createElement("tr");
 
-    const durumText = currentTab==="kargolandi" ? (o.shipmentStatus ?? "—") : o.kargo_durumu;
+   const durumText = ["kargolandi", "tamamlandi", "sorunlu"].includes(currentTab)
+    ? (o.shipmentStatus ?? "—")
+    : o.kargo_durumu;
 
-    const actionBtn = currentTab==="kargolandi"
-      ? `<button class="btn-open" onclick="event.stopPropagation(); openTrackingUrl('${o.kargo_takip_url ?? ""}')">Sorgula</button>`
-      : `<button class="btn-open">Aç</button>`;
+    const isTrackingTab = ["kargolandi", "tamamlandi", "sorunlu"].includes(currentTab);
+
+const actionBtn = isTrackingTab
+  ? `<button class="btn-open" onclick="event.stopPropagation(); openTrackingUrl('${o.kargo_takip_url ?? ""}')">Sorgula</button>`
+  : `<button class="btn-open">Aç</button>`;
+
 
     tr.innerHTML = `
       <td>${o.siparis_no}</td>
@@ -160,16 +167,20 @@ async function openOrder(id){
   renderDetails();
   document.getElementById("orderModal").style.display = "flex";
 }
-function closeModal(){ document.getElementById("orderModal").style.display = "none"; }
 
-function renderDetails(){
+function closeModal(){ 
+  document.getElementById("orderModal").style.display = "none"; 
+}
+
+function renderDetails() {
   const d = selectedOrder;
-
-  /* — ÖNCE TÜM BUTONLARI SIFIRLA — */
+   
+  /* — ÖNCE TÜM BUTONLARI RESETLE — */
   document.querySelectorAll("#actionButtons button").forEach(btn => {
     btn.style.display = "inline-block";
   });
 
+  /* — DETAY HTML — */
   document.getElementById("orderDetails").innerHTML = `
     <p><b>No:</b> ${d.siparis_no}</p>
     <p><b>İsim:</b> ${d.ad_soyad}</p>
@@ -191,48 +202,91 @@ function renderDetails(){
     <p><b>Not:</b> ${d.notlar ?? "-"}</p>
   `;
 
-  const iptal = d.kargo_durumu==="İptal";
-  const kargo = d.kargo_durumu==="Kargolandı";
-  const tamam = d.kargo_durumu==="Tamamlandı";
+  /* ============================================================
+      SOR BUTONU KURAL — SADECE Bekliyor ve Hazırlandı GÖRÜNECEK
+  ============================================================ */
+  try {
+    const sorBtn = document.querySelector(".btn-mini");
+    if (sorBtn) {
+      if (["Bekliyor", "Hazırlandı"].includes(d.kargo_durumu)) {
+        sorBtn.style.display = "inline-block";
+      } else {
+        sorBtn.style.display = "none";
+      }
+    }
+  } catch (e) {}
 
-  /* BEKLEYEN — HAZIRLANDI — VS DURUMLARI */
+  /* ============================================================
+      HAZIRLANDI DURUMUNDA DÜZENLE BUTONUNU GİZLE
+  ============================================================ */
+  try {
+    const duzenleBtn = [...document.querySelectorAll("#actionButtons button")]
+      .find(btn => btn.textContent.trim() === "Düzenle");
+
+    if (duzenleBtn && d.kargo_durumu === "Hazırlandı") {
+      duzenleBtn.style.display = "none";
+    }
+  } catch (e) {}
+
+  /* ============================================================
+      BEKLİYOR BUTONU KURAL — 
+      Bekleyen ekranında GÖRÜNMEYECEK
+      Hazırlandı ekranında GÖRÜNECEK
+      Diğer durumlarda GÖRÜNMEYECEK
+  ============================================================ */
+  try {
+    const bekliyorBtn = document.getElementById("btnWaiting");
+
+    if (bekliyorBtn) {
+      if (d.kargo_durumu === "Bekliyor") {
+        bekliyorBtn.style.display = "none"; // bekleyen ekranda gereksiz
+      }
+      else if (d.kargo_durumu === "Hazırlandı") {
+        bekliyorBtn.style.display = "inline-block"; // hazırlandı → geri al
+      }
+      else {
+        bekliyorBtn.style.display = "none"; // diğer durumlarda gizli
+      }
+    }
+  } catch (e) {}
+
+  /* ============================================================
+      DİĞER DURUMLAR (KARGO / TAMAM / İPTAL)
+  ============================================================ */
+
+  const iptal = d.kargo_durumu === "İptal";
+  const kargo = d.kargo_durumu === "Kargolandı";
+  const tamam = d.kargo_durumu === "Tamamlandı";
+
+  /* Bekliyor → Hazırla butonu */
   document.getElementById("btnPrepare").style.display =
-    (d.kargo_durumu==="Bekliyor") ? "inline-block" : "none";
+    (d.kargo_durumu === "Bekliyor") ? "inline-block" : "none";
 
+  /* Hazırlandı → Kargola butonu */
   document.getElementById("btnCargo").style.display =
-    (d.kargo_durumu==="Hazırlandı") ? "inline-block" : "none";
+    (d.kargo_durumu === "Hazırlandı") ? "inline-block" : "none";
 
+  /* Kargolandı → Barkod Kes */
   document.getElementById("btnBarcode").style.display =
     kargo ? "inline-block" : "none";
 
-  document.getElementById("btnWaiting").style.display =
-    (!["Bekliyor","Kargolandı"].includes(d.kargo_durumu)) ? "inline-block" : "none";
-
-
-  /* — KARGOLANDI DURUMUNDA — (Queen Kuralları) */
-  if(kargo){
-    document.querySelector("#actionButtons .btn-warning").style.display = "none"; // düzenle
-    document.getElementById("btnPrepare").style.display = "none";
-    document.getElementById("btnCargo").style.display = "none";
-    document.getElementById("btnWaiting").style.display = "none";
-  }
-
-  /* — TAMAMLANAN — sadece kapat */
-  if(tamam){
-    document.querySelectorAll("#actionButtons button").forEach(btn=>btn.style.display="none");
+  /* — TAMAMLANAN → sadece kapat — */
+  if (tamam) {
+    document.querySelectorAll("#actionButtons button").forEach(btn => btn.style.display = "none");
     document.querySelector("#actionButtons .btn-close").style.display = "inline-block";
   }
 
   /* — İPTAL DURUMU — */
-  document.getElementById("actionButtons").style.display = iptal ? "none":"flex";
-  document.getElementById("restoreButtons").style.display= iptal ? "flex":"none";
+  document.getElementById("actionButtons").style.display = iptal ? "none" : "flex";
+  document.getElementById("restoreButtons").style.display = iptal ? "flex" : "none";
 
-  document.getElementById("editButtons").style.display="none";
-  document.getElementById("cancelForm").style.display="none";
+  document.getElementById("editButtons").style.display = "none";
+  document.getElementById("cancelForm").style.display = "none";
 }
 
+
 /* ============================================================
-   ŞEHİR/İLÇE KODU SOR
+   ŞEHİR/İLÇE KODU SOR  (ORİJİNAL - WEBHOOK İLE)
 ============================================================ */
 async function queryCityDistrictCodes(){
   toast("Kodlar sorgulanıyor...");
@@ -242,6 +296,7 @@ async function queryCityDistrictCodes(){
     headers:{ "Content-Type":"application/json" },
     body: JSON.stringify(selectedOrder)
   });
+
   if(!res.ok) return toast("Kod bulunamadı");
 
   const d = await res.json();
@@ -349,7 +404,7 @@ Bu işlem normal şartlarda geri alınamaz ve iptal durumunda kargo firması ek 
   }catch(e){
     toast("Gönderim hatası");
   }finally{
-    setTimeout(()=>busy.kargola.delete(key), 30000);
+    setTimeout(()=>busy.kargola.delete(key), 20000);
   }
 }
 
