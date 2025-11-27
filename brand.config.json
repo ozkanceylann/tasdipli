@@ -1,0 +1,15 @@
+{
+  "brand": "tasdipli",
+  "brandName": "TASDİPLİ",
+  "logo": "tasdipli_logo.png",
+  "favicon": "favicon.png",
+
+  "table": "tasdipli_siparisler",
+
+  "webhooks": {
+    "kargola": "https://n8n.ozkanceylan.uk/webhook/kargola_tasdipli",
+    "barkod": "https://n8n.ozkanceylan.uk/webhook/barkod_tasdipli",
+    "iptal": "https://n8n.ozkanceylan.uk/webhook/kargo_iptal_tasdipli",
+    "sehir_ilce": "https://n8n.ozkanceylan.uk/webhook/sehir_ilce_kodu_sor"
+  }
+}
