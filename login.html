@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tasdipli Sipariş Takip Sistemi - Giriş</title>
@@ -97,7 +96,7 @@
 <body>
 
   <div class="login-box">
-    <img src="tasdipli_logo.png" class="logo" alt="Tasdipli Logo" />
+    <img src="tasdipli_logo.png" class="logo" alt="Logo" />
 
     <h2>Tasdipli Sipariş Takip Sistemi</h2>
 
@@ -116,7 +115,6 @@
     <div class="error" id="errorBox"></div>
   </div>
 
-  <!-- MODULE SCRIPT -->
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -130,7 +128,6 @@
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
       const errorBox = document.getElementById("errorBox");
-
       errorBox.style.display = "none";
 
       const { data, error } = await db.auth.signInWithPassword({ email, password });
@@ -142,10 +139,7 @@
       }
 
       const user = data.user;
-      const meta =
-        user.user_metadata && Object.keys(user.user_metadata).length > 0
-          ? user.user_metadata
-          : user.raw_user_meta_data;
+      const meta = user.user_metadata ?? user.raw_user_meta_data;
 
       if (!meta.firma || meta.firma.toLowerCase() !== "tasdipli") {
         errorBox.innerText = "Bu panele sadece Tasdipli kullanıcıları giriş yapabilir!";
