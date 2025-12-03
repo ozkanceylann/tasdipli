@@ -1,3 +1,5 @@
+
+
 /* ==============================
    GENEL
 ============================== */
@@ -26,7 +28,7 @@ body{
    SIDEBAR & MOBİL MENÜ
 ============================== */
 .sidebar{
-  width:260px; height:100vh;
+  width:220px; height:100vh;
   position:fixed; left:0; top:0; z-index:999;
   background:var(--sidebar); color:#fff;
   padding:25px 15px; display:flex; flex-direction:column;
@@ -38,15 +40,15 @@ body{
 
 .menu{ list-style:none; padding:0; margin:35px 0 0 }
 .menu li{
-  background:var(--sidebar-2); padding:13px; margin-bottom:12px;
-  text-align:center; border-radius:8px; cursor:pointer; font-size:16px;
+  background:var(--sidebar-2); padding:8px 10px; margin-bottom:12px;
+  text-align:center; border-radius:8px; cursor:pointer; font-size:13px;
   transition:.2s
 }
 .menu li:hover{ background:#24445f }
 .menu li.active{ background:var(--brand)!important; font-weight:700 }
 
 .btn-danger{
-  width:100%; margin-top:auto; padding:12px; font-size:15px;
+  width:100%; margin-top:auto; padding:10px; font-size:13px;
   background:var(--danger); color:#fff; border:none; border-radius:8px; cursor:pointer
 }
 .btn-danger:hover{ background:#c9302c }
@@ -60,7 +62,7 @@ body{
 /* ==============================
    ANA İÇERİK & ÜST BAR
 ============================== */
-.content-area{ margin-left:260px; padding:25px; transition:.3s }
+.content-area{ margin-left:220px; padding:25px; transition:.3s }
 .top-bar{ display:flex; gap:10px; margin-bottom:20px }
 .top-bar input{
   flex:1; padding:12px; font-size:15px; border-radius:8px; border:1px solid #ccc; background:#fff
@@ -81,17 +83,52 @@ body{
   box-shadow:0 2px 8px rgba(0,0,0,.12)
 }
 .orders-table th{
-  background:var(--table-head); color:#123; padding:14px; font-size:15px; text-align:left;
+  background:var(--table-head); color:#123; padding:10px; font-size:12px; text-align:left;
   border-bottom:1px solid var(--table-border); white-space:nowrap
 }
 .orders-table td{
-  padding:13px; border-bottom:1px solid #f0f0f0; font-size:14px; white-space:nowrap
+  padding:10px; border-bottom:1px solid #f0f0f0; font-size:12px; white-space:nowrap
 }
-.orders-table tr:hover{ background:#f4f9f4 }
+.orders-table tbody tr,
+.orders-table tbody tr td{
+  cursor:pointer;
+  user-select:none;
+}
+.orders-table tr:hover{
+  background:#d8e9d8;
+  box-shadow:inset 4px 0 var(--brand);
+}
 
 .btn-open{
   padding:8px 12px; background:var(--brand-2);
   border:none; border-radius:6px; color:#fff; cursor:pointer; font-size:13px
+}
+
+.error-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  max-width:240px;
+  background:#fcebea;
+  color:#9b1c1c;
+  border:1px solid #f5c6cb;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.error-chip__label{
+  font-weight:700;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+.error-chip__text{
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .btn-load-more{
   margin:20px auto; display:block; padding:12px 20px;
@@ -179,12 +216,75 @@ textarea{
   width:100%; height:90px; border-radius:8px; padding:12px; border:1px solid #ccc; font-size:14px
 }
 
+input, select{
+  width:100%;
+  padding:11px 12px;
+  border-radius:10px;
+  border:1px solid #d9e2ec;
+  font-size:14px;
+  background:#fff;
+}
+
 /* Düzenleme grid */
 .edit-grid{
   display:grid; grid-template-columns:1fr 1fr; gap:14px
 }
 .edit-grid .full-row{
   grid-column:1 / -1
+}
+
+.edit-card{
+  background:#f9fbfd;
+  border:1px solid #d9e2ec;
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 8px 30px rgba(0,0,0,.08);
+}
+
+.edit-card__header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.eyebrow{
+  margin:0;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--muted);
+}
+
+.title{
+  margin:2px 0 0;
+  font-size:20px;
+  font-weight:700;
+}
+
+.pill{
+  padding:8px 12px;
+  background:rgba(60,141,13,.1);
+  color:var(--brand);
+  border:1px solid rgba(60,141,13,.2);
+  border-radius:999px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.form-field label{
+  display:block;
+  margin-bottom:6px;
+  font-size:13px;
+  font-weight:600;
+  color:#123;
+}
+
+.input-ghost{
+  background:#f8fafc;
+  color:#1f3a52;
+  font-weight:700;
 }
 
 /* ==============================
@@ -197,6 +297,18 @@ textarea{
 .alert-card{
   width:min(520px,92vw); background:#fff; border-radius:14px; padding:22px;
   box-shadow:0 10px 30px rgba(0,0,0,.25); animation:pop .18s ease
+}
+.error-detail-card .alert-text{ margin-top:6px; }
+.error-detail-text{
+  width:100%;
+  min-height:160px;
+  border-radius:10px;
+  padding:12px;
+  border:1px solid #d9e2ec;
+  background:#f8fafc;
+  font-family:"SFMono-Regular",Consolas,Monaco,monospace;
+  white-space:pre-wrap;
+  resize:vertical;
 }
 .alert-title{ font-size:18px; font-weight:700; margin:0 0 8px; color:#12263a }
 .alert-text{ font-size:14px; color:#333; line-height:1.5 }
@@ -256,7 +368,7 @@ body.login-page{
 ============================== */
 canvas{ max-width:100% }
 @media (min-width:900px){
-  .content-area{ margin-left:260px!important }
+  .content-area{ margin-left:220px!important }
 }
 
 /* ==============================
@@ -271,22 +383,25 @@ canvas{ max-width:100% }
   .content-area{ margin-left:0!important; padding-top:70px }
   .edit-grid{ grid-template-columns:1fr } /* form tek kolon */
 }
+
+
 #actionButtons {
   display: flex;
-  flex-wrap: wrap;        /* Alt satır oluşturmaya izin ver */
+  flex-wrap: nowrap;
   gap: 10px;
 }
 
 #actionButtons button {
-  flex: 0 0 auto;         /* Üst satırdaki butonlar sabit genişlik */
+  flex: 1;        /* Hepsi eşit genişlik */
+  min-width: 0;   /* Taşmayı önler */
 }
 
-/* Kapat butonu altta tek satır */
+/* Kapat butonu özel davranmasın → ESKİ KURAL SİLİNECEK */
 #actionButtons .btn-close {
-  flex-basis: 100%;
-  order: 99;
-  justify-content: center;
+  flex-basis: auto !important;
+  order: unset !important;
 }
+
 
 /* İptal Et butonu mutlaka üst satırda */
 #actionButtons .btn-danger {
