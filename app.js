@@ -812,7 +812,8 @@ function cancelCancelForm(){
 
 async function confirmCancel() {
 
-  const isShipped = !!selectedOrder.shipmentStatusCode;
+  const code = Number(selectedOrder.shipmentStatusCode);
+  const isShipped = code >= 1 && code <= 9;
 
   const modalOk = await confirmModal({
     title: isShipped 
@@ -853,6 +854,7 @@ async function confirmCancel() {
   closeModal();
   loadOrders(true);
 }
+
 
 
 async function restoreOrder(){
