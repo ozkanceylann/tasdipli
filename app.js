@@ -758,13 +758,21 @@ Bu işlem normal şartlarda geri alınamaz ve iptal durumunda kargo firması ek 
       headers:{ "Content-Type":"application/json" },
       body: JSON.stringify(selectedOrder)
     });
+
     toast("Kargoya gönderildi.");
+
+    // 🔥 1 saniye sonra listeyi yenile
+    setTimeout(() => {
+      loadOrders(true);
+    }, 1000);
+
   }catch(e){
     toast("Gönderim hatası");
   }finally{
     setTimeout(()=>busy.kargola.delete(key), 20000);
   }
 }
+
 
 async function printBarcode(){
   const ok = await confirmModal({
