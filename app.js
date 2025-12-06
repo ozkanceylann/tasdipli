@@ -288,8 +288,10 @@ async function deleteCanceledOrder() {
 
   toast("Sipariş silindi");
   closeModal();
-  loadOrders(true);
+
+  setTimeout(() => loadOrders(true), 1000);
 }
+
 
 
 
@@ -718,9 +720,11 @@ async function setWaiting(){
   await db.from(TABLE)
     .update({ kargo_durumu: "Bekliyor" })
     .eq("siparis_no", selectedOrder.siparis_no);
+
   toast("Sipariş Bekliyor olarak güncellendi");
   closeModal();
-  loadOrders(true);
+
+  setTimeout(() => loadOrders(true), 1000);
 }
 
 async function markPrepared(){
@@ -732,8 +736,10 @@ async function markPrepared(){
 
   toast("Sipariş Hazırlandı");
   closeModal();
-  loadOrders(true);
+
+  setTimeout(() => loadOrders(true), 1000);
 }
+
 
 async function sendToCargo(){
 
@@ -911,7 +917,8 @@ async function restoreOrder(){
 
   toast("Sipariş geri alındı");
   closeModal();
-  loadOrders(true);
+
+  setTimeout(() => loadOrders(true), 1000);
 }
 
 /* ============================================================
