@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>♕️ Sipariş Fişi</title>
+<title>♕️ Fiş Yazdır</title>
 
 <!-- TERMAL YAZICI AYARLARI -->
 <style>
@@ -26,17 +26,15 @@ html, body {
   margin: 6px 0 4px 0;
 }
 .logo img {
-  width: 90px;     /* Küçültüldü */
+  width: 120px;
   height: auto;
-  opacity: 0.95;
 }
 
 /* Başlık */
 h2 {
   text-align: center;
   font-size: 13px;
-  margin: 4px 0 8px 0;
-  font-weight: bold;
+  margin: 4px 0;
 }
 
 /* İçerik */
@@ -57,37 +55,17 @@ h2 {
 
 <!-- LOGO -->
 <div class="logo">
-  <img id="brandLogo" src="">
+  <img src="logo.png">
 </div>
 
-<!-- DİNAMİK MARKA BAŞLIĞI -->
-<h2 id="brandTitle"></h2>
+<h2>♕️ SİPARİŞ FİŞİ</h2>
 
 <!-- JS’den içeriği basacağımız yer -->
 <div id="content"></div>
 
 <script>
 /* ============================================================
-   LOGO ve MARKA ADI — Ana pencereden alınır
-============================================================ */
-window.onload = function () {
-  try {
-    // LOGO (CONFIG.logo değeri)
-    const logo = window.opener?.brandLogo || "logo.png";
-    document.getElementById("brandLogo").src = logo;
-
-    // MARKA ADI (CONFIG.brandName değeri)
-    const brandName = window.opener?.CONFIG?.brandName || "Sipariş";
-    document.getElementById("brandTitle").innerHTML = `♕️ ${brandName} SİPARİŞ`;
-
-  } catch (e) {
-    document.getElementById("brandLogo").src = "logo.png";
-    document.getElementById("brandTitle").innerHTML = "♕️ SİPARİŞ";
-  }
-};
-
-/* ============================================================
-   Yazdırma Fonksiyonu – app.js tarafından çağrılır
+   BU FONKSİYON app.js TARAFINDAN ÇAĞRILIR
 ============================================================ */
 window.doPrint = function () {
   setTimeout(() => {
