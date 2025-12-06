@@ -805,21 +805,26 @@ function cancelCancelForm(){
   document.getElementById("cancelForm").style.display = "none";
   document.getElementById("actionButtons").style.display = "flex";
 }
+
+
 /* ============================================================
    KARGOLANMIŞ İPTAL
 ============================================================ */
 
-
 async function confirmCancel() {
+  // shipmentStatusCode güvenli parse
+  let raw = (selectedOrder?.shipmentStatusCode ?? "").toString().trim();
+  let isShipped = false;
 
-  const code = Number(selectedOrder.shipmentStatusCode);
-  const isShipped = code >= 1 && code <= 9;
+  if (raw === "" || raw === "0") {
+    isShipped = false;
+  } else {
+    const num = parseInt(raw, 10);
+    isShipped = Number.isInteger(num) && num >= 1 && num <= 9;
+  }
 
   const modalOk = await confirmModal({
-    title: isShipped 
-      ? "Kargolanmış Siparişi İptal Et"
-      : "Siparişi İptal Et",
-
+    title: isShipped ? "Kargolanmış Siparişi İptal Et" : "Siparişi İptal Et",
     text: isShipped
       ? `Bu sipariş kargo firmasına gönderilmiş durumda.
 İptal işlemi sonucunda kargo firması tarafından ek ücretler talep edilebilir.
@@ -828,7 +833,6 @@ async function confirmCancel() {
       : `Bu sipariş henüz kargoya verilmemiş.
 
 İptal Nedeni (zorunlu)`,
-
     confirmText: "İptal Et",
     cancelText: "Vazgeç"
   });
@@ -838,12 +842,23 @@ async function confirmCancel() {
   const reason = document.getElementById("iptalInput").value.trim();
   if (!reason) return toast("İptal nedeni gerekli");
 
-  await fetch(WH_IPTAL, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({ ...selectedOrder, reason })
-  });
+  // Webhook tanımlı değilse sessizce atlama yerine bilgi verelim
+  if (!WH_IPTAL) {
+    toast("Bu marka için iptal webhook tanımlı değil (CONFIG.webhooks.iptal).");
+  } else {
+    try {
+      await fetch(WH_IPTAL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...selectedOrder, reason, isShipped })
+      });
+    } catch {
+      // webhook hatası UI akışını bozmasın; yine de statüyü düşürelim
+      toast("İptal webhook gönderilemedi.");
+    }
+  }
 
+  // Her durumda DB’de statü “İptal” olsun
   await db.from(TABLE).update({
     kargo_durumu: "İptal",
     iptal_nedeni: reason,
@@ -854,6 +869,7 @@ async function confirmCancel() {
   closeModal();
   loadOrders(true);
 }
+
 
 
 
