@@ -846,19 +846,19 @@ async function confirmCancel() {
   if (!reason) return toast("İptal nedeni gerekli");
 
   // shipmentStatusCode güvenli parse
-  const codeRaw = selectedOrder?.shipmentStatusCode;
+  const raw = selectedOrder?.shipmentStatusCode;
   let isShipped = false;
 
-  if (codeRaw === null || codeRaw === undefined || codeRaw === "" || codeRaw === "0") {
+  if (raw === null || raw === undefined || raw === "" || raw === "0") {
     isShipped = false;
   } else {
-    const num = Number(codeRaw);
+    const num = Number(raw);
     isShipped = Number.isInteger(num) && num >= 1 && num <= 9;
   }
 
-  // BURADA ARTIK POPUP YOK! (openCancelForm hallediyor)
+  // ❌ Bu fonksiyonda popup yok → openCancelForm hallediyor
 
-  // Webhook çalıştır
+  // Webhook gönder
   if (WH_IPTAL) {
     try {
       await fetch(WH_IPTAL, {
