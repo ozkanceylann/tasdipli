@@ -264,6 +264,36 @@ function openTrackingUrl(url){
 }
 
 /* ============================================================
+   İPTALDEN SİLME
+============================================================ */
+
+async function deleteCanceledOrder() {
+
+  const ok = await confirmModal({
+    title: "Siparişi Sil",
+    text: "Bu sipariş tamamen listelerden kaldırılacaktır. İşlem geri alınamaz.\nOnaylıyor musunuz?",
+    confirmText: "Sil",
+    cancelText: "Vazgeç"
+  });
+
+  if (!ok) return;
+
+  await db.from(TABLE)
+    .update({ 
+      kargo_durumu: "Silindi",
+      iptal_nedeni: null,
+      iptal_tarihi: new Date().toISOString()
+    })
+    .eq("siparis_no", selectedOrder.siparis_no);
+
+  toast("Sipariş silindi");
+  closeModal();
+  loadOrders(true);
+}
+
+
+
+/* ============================================================
    GÖNDERİM HATA DETAYI
 ============================================================ */
 function showErrorDetail(message=""){
@@ -775,24 +805,37 @@ function cancelCancelForm(){
   document.getElementById("cancelForm").style.display = "none";
   document.getElementById("actionButtons").style.display = "flex";
 }
+/* ============================================================
+   KARGOLANMIŞ İPTAL
+============================================================ */
 
-async function confirmCancel(){
 
-  /* — QUEEN TARZI UYARI — */
+async function confirmCancel() {
+
+  const isShipped = !!selectedOrder.shipmentStatusCode;
+
   const modalOk = await confirmModal({
-    title: "Kargolanmış Siparişi İptal Et",
-    text: `Bu sipariş kargo firmasına gönderilmiş durumda.
+    title: isShipped 
+      ? "Kargolanmış Siparişi İptal Et"
+      : "Siparişi İptal Et",
+
+    text: isShipped
+      ? `Bu sipariş kargo firmasına gönderilmiş durumda.
 İptal işlemi sonucunda kargo firması tarafından ek ücretler talep edilebilir.
 
+İptal Nedeni (zorunlu)`
+      : `Bu sipariş henüz kargoya verilmemiş.
+
 İptal Nedeni (zorunlu)`,
+
     confirmText: "İptal Et",
     cancelText: "Vazgeç"
   });
 
-  if(!modalOk) return;
+  if (!modalOk) return;
 
   const reason = document.getElementById("iptalInput").value.trim();
-  if(!reason) return toast("İptal nedeni gerekli");
+  if (!reason) return toast("İptal nedeni gerekli");
 
   await fetch(WH_IPTAL, {
     method:"POST",
@@ -801,7 +844,7 @@ async function confirmCancel(){
   });
 
   await db.from(TABLE).update({
-    kargo_durumu:"İptal",
+    kargo_durumu: "İptal",
     iptal_nedeni: reason,
     iptal_tarihi: new Date().toISOString()
   }).eq("siparis_no", selectedOrder.siparis_no);
@@ -810,6 +853,7 @@ async function confirmCancel(){
   closeModal();
   loadOrders(true);
 }
+
 
 async function restoreOrder(){
   const ok = await confirmModal({
@@ -994,6 +1038,7 @@ Object.assign(window, {
   restoreOrder,
 
   queryCityDistrictCodes,
+deleteCanceledOrder,
 
   printSiparis,
 });
