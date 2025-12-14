@@ -46,6 +46,14 @@ function getColumnCount(){
   return currentTab === "bekleyen" ? 6 : 7;
 }
 
+function shouldShowNoteColumn(tab) {
+  return ["bekleyen", "hazirlandi"].includes(tab);
+}
+
+function shouldShowCargoCode(tab) {
+  return ["kargolandi", "tamamlandi", "sorunlu"].includes(tab);
+}
+
 function renderTableHeader(){
   const head = document.getElementById("ordersHeadRow");
   if(!head) return;
@@ -232,7 +240,7 @@ const noteChip = `
       data-note="${escapeHtml(o.notlar ?? "")}"
       onclick="event.stopPropagation(); showNoteDetail(this.dataset.note)">
       <span class="error-chip__label">Not</span>
-      <span class="error-chip__text">${escapeHtml(shortenNote(o.notlar, 40))}</span>
+      <span class="error-chip__text">${escapeHtml(shortenNote(o.notlar, 20))}</span>
   </button>
 `;
 
@@ -262,9 +270,18 @@ tr.innerHTML = isPendingTab
 </td>
 
     <td>${o.toplam_tutar} TL</td>
-    <td>${durumText}</td>
-    <td>${noteChip}</td>
-    <td>${errorPreview}</td>
+<td>${durumText}</td>
+
+<td>
+  ${
+    shouldShowNoteColumn(currentTab)
+      ? noteChip
+      : (o.kargo_takip_kodu ?? "-")
+  }
+</td>
+
+<td>${errorPreview}</td>
+
   `;
 
 // Satır tıklama kontrolü (chip'e tıklayınca detay açılmasın)
@@ -477,7 +494,6 @@ function renderDetails() {
   /* — DETAY HTML — */
 document.getElementById("orderDetails").innerHTML = `
   <div class="detail-group">
-    <div class="detail-title">🔹 Genel Bilgiler</div>
     <div class="detail-item"><b>No:</b> ${d.siparis_no}</div>
     <div class="detail-item"><b>Sipariş Alan:</b> ${d.siparis_alan ?? "-"}</div>
     <div class="detail-item"><b>Sipariş Alan Tel:</b> ${d.siparis_tel}</div>    
@@ -516,10 +532,22 @@ document.getElementById("orderDetails").innerHTML = `
     <div class="detail-item"><b>Ödeme:</b> ${d.odeme_sekli}</div>
   </div>
 
-  <div class="detail-group">
-    <div class="detail-title">📝 Not</div>
-    <div class="detail-item">${d.notlar ?? "-"}</div>
-  </div>
+<div class="detail-group">
+  <div class="detail-title">📝 Not</div>
+
+  ${
+    d.notlar
+      ? `
+        <div class="note-card">
+          <div class="note-text">${escapeHtml(d.notlar)}</div>
+        </div>
+      `
+      : `
+        <div class="note-empty">Not girilmemiş</div>
+      `
+  }
+</div>
+
 `;
 
   /* ============================================================

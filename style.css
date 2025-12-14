@@ -736,3 +736,32 @@ body.login-page {
   gap: 6px;
   font-size: 12px;
 }
+/* =========================
+   SİPARİŞ NOTU – DETAY
+========================= */
+.note-card {
+  background: linear-gradient(135deg, #fff7e6, #fffaf0);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  border-left: 5px solid #ffc107;
+
+  padding: 12px 14px;
+  border-radius: 10px;
+
+  font-size: 13px;
+  line-height: 1.5;
+  color: #5c4700;
+
+  max-height: 110px;          /* 🔒 çok uzamasın */
+  overflow-y: auto;
+}
+
+.note-text {
+  white-space: pre-wrap;      /* alt satırlar korunsun */
+}
+
+/* Not yoksa */
+.note-empty {
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
