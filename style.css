@@ -714,3 +714,25 @@ body.login-page {
 .orders-table th {
   cursor: default !important;
 }
+/* Order listesi – ürün adı limiti */
+.order-product-limit {
+  max-width: 640px;       /* gerekirse 200-260 arası oynat */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: middle;
+}
+/* Tarih pill */
+.pill-date {
+  background: rgba(13,110,253,0.12);
+  color: #2d7d27;
+  border: 1px solid rgba(2, 45, 6, 0.25);
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
