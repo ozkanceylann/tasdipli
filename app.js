@@ -373,6 +373,55 @@ function openTrackingUrl(url){
   window.open(url, "_blank");
 }
 
+function printEtiket(){
+  localStorage.setItem("print_order", JSON.stringify(selectedOrder));
+  window.open("printetiket.html", "_blank", "width=320,height=240");
+}
+function openPrintChooser(){
+  const root = document.getElementById("alertRoot");
+  root.innerHTML = "";
+
+  const wrap = document.createElement("div");
+  wrap.className = "alert-backdrop";
+
+  wrap.innerHTML = `
+    <div class="alert-card">
+      <div class="alert-title">🖨 Yazdırma Seçimi</div>
+
+      <div class="alert-actions" style="flex-direction:column;gap:10px">
+        <button class="btn-primary" id="btnPrintAdisyon">
+          🧾 Adisyon Yazdır
+        </button>
+
+        <button class="btn-secondary" id="btnPrintEtiket">
+          🏷 Etiket Yazdır (40×60)
+        </button>
+
+        <button class="btn-close" id="btnCancelPrint">
+          Vazgeç
+        </button>
+      </div>
+    </div>
+  `;
+
+  root.appendChild(wrap);
+
+  // 🔥 JS EVENT BIND (EN KRİTİK KISIM)
+  document.getElementById("btnPrintAdisyon").onclick = () => {
+    printSiparis(selectedOrder);
+  };
+
+  document.getElementById("btnPrintEtiket").onclick = () => {
+    printEtiket();
+  };
+
+  document.getElementById("btnCancelPrint").onclick = () => {
+    wrap.remove();
+  };
+}
+
+
+
 /* ============================================================
    İPTALDEN SİLME
 ============================================================ */
@@ -914,7 +963,7 @@ async function markPrepared(){
     .update({ kargo_durumu:"Hazırlandı" })
     .eq("siparis_no", selectedOrder.siparis_no);
 
-  printSiparis(selectedOrder);
+  openPrintChooser(); // ✅ artık seçim soruyor
 
   toast("Sipariş Hazırlandı");
   closeModal();
@@ -1353,7 +1402,9 @@ Object.assign(window, {
 deleteCanceledOrder,
 showNoteDetail,
 
+  openPrintChooser,
   printSiparis,
+  printEtiket
 });
 /* ============================================================
    BAŞLAT
